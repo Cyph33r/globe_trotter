@@ -16,17 +16,19 @@ class CountryListScreen extends StatelessWidget {
         child: Column(
           children: [
             FutureBuilder(
-              future: CountryRepository.loadCounties(),
-              builder: (context, data) =>
-                  data.connectionState == ConnectionState.done
-                      ? Expanded(
-                        child: ListView(
-                            children: CountryRepository.getAllCountries.values
-                                .map((country) => CountryListItem(country: country))
-                                .toList(),
-                          ),
-                      )
-                      : const Center(child: CircularProgressIndicator()),
+              future: CountryRepository.loadCounties().onError(
+                  (error, stackTrace) =>
+                      print(error.toString() + stackTrace.toString())),
+              builder: (context, data) => data.connectionState ==
+                      ConnectionState.done
+                  ? Expanded(
+                      child: ListView(
+                        children: CountryRepository.getAllCountries.values
+                            .map((country) => CountryListItem(country: country))
+                            .toList(),
+                      ),
+                    )
+                  : const Center(child: CircularProgressIndicator()),
             ),
           ],
         ),

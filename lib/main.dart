@@ -4,6 +4,7 @@ import 'package:globe_trotter/screens/coutry_list_screen.dart';
 import './data/country_api_helper.dart';
 
 void main() {
+
   runApp(const MyApp());
 }
 

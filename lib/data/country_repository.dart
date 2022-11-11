@@ -1,12 +1,14 @@
+import 'package:isar/isar.dart';
 import '../data/country_api_helper.dart';
 
 import '../models/country.dart';
 
 class CountryRepository {
-  static final _countryCache = <String, Country>{};
+  static final _countries = <String, Country>{};
+  static late Isar countryDb;
 
   static Map<String, Country> get getAllCountries {
-    return {..._countryCache};
+    return {..._countries};
   }
 
   List<Country> filterCountries(CountryFilter filter) {
@@ -17,8 +19,7 @@ class CountryRepository {
     }
     if (filter.continent != null) {}
     if (filter.timeZone != null) {
-      toReturn.removeWhere((country) =>
-          !(country.timezones
+      toReturn.removeWhere((country) => !(country.timezones
               ?.any((timeZone) => timeZone == filter.timeZone?.asString) ??
           false));
     }
@@ -29,17 +30,34 @@ class CountryRepository {
   CountryRepository._();
 
   static Future<void> ensureCacheFilled() async {
-    if (_countryCache.isEmpty) {
+    if (_countries.isEmpty) {
       await loadCounties();
     }
   }
 
   static Future<void> loadCounties() async {
-    final countryList = await CountryApiHelper.getAllCountries();
-      for (var country in countryList) {
-        _countryCache.addAll(
+    try {
+      countryDb = Isar.openSync([CountrySchema]);
+    } on IsarError {
+      countryDb = Isar.getInstance('default')!;
+    }
+    final List<Country> cachedData =
+        await countryDb.countries.where().findAll();
+    if (cachedData.isEmpty) {
+      final countryList = await CountryApiHelper.getAllCountries();
+      await countryDb.writeTxn(() async {
+        for (Country country in countryList) {
+          _countries.addAll(
+              {country.name?.common?.toLowerCase() ?? "Unnamed": country});
+          await countryDb.countries.put(country);
+        }
+      });
+    } else {
+      for (Country country in cachedData) {
+        _countries.addAll(
             {country.name?.common?.toLowerCase() ?? "Unnamed": country});
       }
+    }
   }
 }
 

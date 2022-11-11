@@ -1,6 +1,9 @@
 import 'package:isar/isar.dart';
+import 'package:isar/isar.dart' as isar;
 
-import 'currency.dart';
+part 'country.g.dart';
+
+
 
 @collection
 class Country {
@@ -25,7 +28,6 @@ class Country {
 
   Country.fromJson(dynamic json) {
     name = json['name'] != null ? Name.fromJson(json['name']) : null;
-    id = Isar.autoIncrement;
     currencies = json['currencies'] != null
         ? Currencies.fromJson(json['currencies'])
         : null;
@@ -48,8 +50,8 @@ class Country {
         : null;
     startOfWeek = json['startOfWeek'];
   }
-
-  late Id id;
+  static var currentId = 0;
+  Id id = currentId++;
   Name? name;
   Currencies? currencies;
   Idd? idd;
@@ -155,8 +157,6 @@ class Currencies {
   Currencies({this.currencies});
 
   Currencies.fromJson(Map<String, dynamic> json) {
-    print(json.runtimeType);
-    print(json);
     for (var currencyInfo in json.values) {
       currencies?.add(Currency.fromJson(currencyInfo));
     }
