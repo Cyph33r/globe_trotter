@@ -3,19 +3,23 @@ import 'package:isar/isar.dart' as isar;
 
 part 'country.g.dart';
 
-
-
+@isar.Name("countries")
 @collection
 class Country {
   Country({
     this.name,
+    this.independent,
+    this.status,
+    this.dialingCode,
+    this.unMember,
     this.currencies,
-    this.idd,
     this.capital,
     this.region,
+    this.subregion,
+    this.languages,
     this.landlocked,
+    this.borders,
     this.area,
-    this.flag,
     this.maps,
     this.population,
     this.car,
@@ -28,15 +32,23 @@ class Country {
 
   Country.fromJson(dynamic json) {
     name = json['name'] != null ? Name.fromJson(json['name']) : null;
+    independent = json['independent'];
+    status = json['status'];
+    dialingCode =
+        json['idd'] != null ? DialingCode.fromJson(json['idd']) : null;
+    unMember = json['unMember'];
     currencies = json['currencies'] != null
         ? Currencies.fromJson(json['currencies'])
         : null;
-    idd = json['idd'] != null ? Idd.fromJson(json['idd']) : null;
     capital = json['capital'] != null ? json['capital'].cast<String>() : [];
     region = json['region'];
+    subregion = json['subregion'];
+    languages = json['languages'] != null
+        ? Languages.fromJson(json['languages'])
+        : null;
     landlocked = json['landlocked'];
+    borders = json['borders'] != null ? json['borders'].cast<String>() : [];
     area = json['area'];
-    flag = json['flag'];
     maps = json['maps'] != null ? Maps.fromJson(json['maps']) : null;
     population = json['population'];
     car = json['car'] != null ? Car.fromJson(json['car']) : null;
@@ -50,16 +62,22 @@ class Country {
         : null;
     startOfWeek = json['startOfWeek'];
   }
+
   static var currentId = 0;
   Id id = currentId++;
   Name? name;
+  bool? independent;
+  String? status;
+  DialingCode? dialingCode;
+  bool? unMember;
   Currencies? currencies;
-  Idd? idd;
   List<String>? capital;
   String? region;
+  String? subregion;
+  Languages? languages;
   bool? landlocked;
+  List<String>? borders;
   double? area;
-  String? flag;
   Maps? maps;
   int? population;
   Car? car;
@@ -68,6 +86,21 @@ class Country {
   Flags? flags;
   CoatOfArms? coatOfArms;
   String? startOfWeek;
+}
+
+@embedded
+class DialingCode {
+  List<String> codes = [];
+
+  DialingCode([this.codes = const <String>[]]);
+
+  DialingCode.fromJson(Map<String, dynamic> json) {
+    if(json["root"] == null) return;
+    final root = json['root'];
+    for (final suffix in (json['suffixes'] ?? [""])) {
+      codes.add(root + suffix);
+    }
+  }
 }
 
 @embedded
@@ -105,16 +138,13 @@ class Flags {
 @embedded
 class Car {
   Car({
-    this.signs,
     this.side,
   });
 
   Car.fromJson(dynamic json) {
-    signs = json['signs'] != null ? json['signs'].cast<String>() : [];
     side = json['side'];
   }
 
-  List<String>? signs;
   String? side;
 }
 
@@ -135,30 +165,44 @@ class Maps {
 }
 
 @embedded
-class Idd {
-  Idd({
-    this.root,
-    this.suffixes,
+class Languages {
+  List<String>? languages = [];
+
+  Languages({
+    this.languages,
   });
 
-  Idd.fromJson(dynamic json) {
-    root = json['root'];
-    suffixes = json['suffixes'] != null ? json['suffixes'].cast<String>() : [];
+  Languages.fromJson(Map<String, dynamic> json) {
+    for (final language in json.values) {
+      languages!.add(language);
+    }
   }
+}
 
-  String? root;
-  List<String>? suffixes;
+@embedded
+class Currency {
+  String? symbol;
+  String? name;
+
+  Currency({this.symbol, this.name});
+
+  Currency.fromJson(Map<String, dynamic> json) {
+    symbol = json['symbol'];
+    name = json['name'];
+  }
 }
 
 @embedded
 class Currencies {
   List<Currency>? currencies = [];
 
-  Currencies({this.currencies});
+  Currencies({
+    this.currencies,
+  });
 
   Currencies.fromJson(Map<String, dynamic> json) {
-    for (var currencyInfo in json.values) {
-      currencies?.add(Currency.fromJson(currencyInfo));
+    for (final currency in json.values) {
+      currencies!.add(Currency.fromJson(currency));
     }
   }
 }
@@ -186,30 +230,13 @@ class Name {
 
 @embedded
 class NativeName {
-  NativeName({this.official, this.common});
-
-  NativeName.fromJson(Map<String, dynamic> json) {
-    official = json.values.first['official'];
-    common = json.values.first['common'];
-  }
-
   String? official;
   String? common;
-}
 
+  NativeName({this.official, this.common});
 
-@embedded
-class Currency {
-  Currency({
-    this.name,
-    this.symbol,
-  });
-
-  Currency.fromJson(dynamic json) {
-    name = json['name'];
-    symbol = json['symbol'];
+  NativeName.fromJson(dynamic json) {
+    official = json['official'];
+    common = json['common'];
   }
-
-  String? name;
-  String? symbol;
 }

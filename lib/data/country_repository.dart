@@ -1,14 +1,21 @@
 import 'package:isar/isar.dart';
 import '../data/country_api_helper.dart';
+import 'package:collection/collection.dart' show insertionSort;
 
 import '../models/country.dart';
 
 class CountryRepository {
-  static final _countries = <String, Country>{};
+  static final _countries = <int, Country>{};
+  static late List<Country> _sortedCountries = <Country>[];
+
   static late Isar countryDb;
 
-  static Map<String, Country> get getAllCountries {
+  static Map<int, Country> get getAllCountries {
     return {..._countries};
+  }
+
+  static List<Country> get getAllCountriesSorted {
+    return [..._sortedCountries];
   }
 
   List<Country> filterCountries(CountryFilter filter) {
@@ -47,17 +54,18 @@ class CountryRepository {
       final countryList = await CountryApiHelper.getAllCountries();
       await countryDb.writeTxn(() async {
         for (Country country in countryList) {
-          _countries.addAll(
-              {country.name?.common?.toLowerCase() ?? "Unnamed": country});
+          _countries.addAll({country.id: country});
           await countryDb.countries.put(country);
         }
       });
     } else {
       for (Country country in cachedData) {
-        _countries.addAll(
-            {country.name?.common?.toLowerCase() ?? "Unnamed": country});
+        _countries.addAll({country.id: country});
       }
     }
+    _sortedCountries = _countries.values.toList();
+    _sortedCountries.sort((country1, country2) =>
+        country1.name!.common!.compareTo(country2.name!.common!));
   }
 }
 
