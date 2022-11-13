@@ -145,6 +145,7 @@ const CountrySchema = CollectionSchema(
     r'Currencies': CurrenciesSchema,
     r'Currency': CurrencySchema,
     r'Languages': LanguagesSchema,
+    r'Language': LanguageSchema,
     r'Maps': MapsSchema,
     r'Car': CarSchema,
     r'Flags': FlagsSchema,
@@ -237,7 +238,7 @@ int _countryEstimateSize(
     }
   }
   {
-    final value = object.languages;
+    final value = object.language;
     if (value != null) {
       bytesCount += 3 +
           LanguagesSchema.estimateSize(
@@ -343,7 +344,7 @@ void _countrySerialize(
     offsets[11],
     allOffsets,
     LanguagesSchema.serialize,
-    object.languages,
+    object.language,
   );
   writer.writeObject<Maps>(
     offsets[12],
@@ -404,7 +405,7 @@ Country _countryDeserialize(
     ),
     independent: reader.readBoolOrNull(offsets[9]),
     landlocked: reader.readBoolOrNull(offsets[10]),
-    languages: reader.readObjectOrNull<Languages>(
+    language: reader.readObjectOrNull<Languages>(
       offsets[11],
       LanguagesSchema.deserialize,
       allOffsets,
@@ -4718,6 +4719,350 @@ extension MapsQueryObject on QueryBuilder<Maps, Maps, QFilterCondition> {}
 // coverage:ignore-file
 // ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
 
+const LanguageSchema = Schema(
+  name: r'Language',
+  id: -2011595345252117802,
+  properties: {
+    r'alphaTwoCode': PropertySchema(
+      id: 0,
+      name: r'alphaTwoCode',
+      type: IsarType.string,
+    ),
+    r'english': PropertySchema(
+      id: 1,
+      name: r'english',
+      type: IsarType.string,
+    )
+  },
+  estimateSize: _languageEstimateSize,
+  serialize: _languageSerialize,
+  deserialize: _languageDeserialize,
+  deserializeProp: _languageDeserializeProp,
+);
+
+int _languageEstimateSize(
+  Language object,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  var bytesCount = offsets.last;
+  bytesCount += 3 + object.alphaTwoCode.length * 3;
+  bytesCount += 3 + object.english.length * 3;
+  return bytesCount;
+}
+
+void _languageSerialize(
+  Language object,
+  IsarWriter writer,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  writer.writeString(offsets[0], object.alphaTwoCode);
+  writer.writeString(offsets[1], object.english);
+}
+
+Language _languageDeserialize(
+  Id id,
+  IsarReader reader,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  final object = Language(
+    alphaTwoCode: reader.readStringOrNull(offsets[0]) ?? "",
+    english: reader.readStringOrNull(offsets[1]) ?? "",
+  );
+  return object;
+}
+
+P _languageDeserializeProp<P>(
+  IsarReader reader,
+  int propertyId,
+  int offset,
+  Map<Type, List<int>> allOffsets,
+) {
+  switch (propertyId) {
+    case 0:
+      return (reader.readStringOrNull(offset) ?? "") as P;
+    case 1:
+      return (reader.readStringOrNull(offset) ?? "") as P;
+    default:
+      throw IsarError('Unknown property with id $propertyId');
+  }
+}
+
+extension LanguageQueryFilter
+    on QueryBuilder<Language, Language, QFilterCondition> {
+  QueryBuilder<Language, Language, QAfterFilterCondition> alphaTwoCodeEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'alphaTwoCode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition>
+      alphaTwoCodeGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'alphaTwoCode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> alphaTwoCodeLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'alphaTwoCode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> alphaTwoCodeBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'alphaTwoCode',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition>
+      alphaTwoCodeStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'alphaTwoCode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> alphaTwoCodeEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'alphaTwoCode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> alphaTwoCodeContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'alphaTwoCode',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> alphaTwoCodeMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'alphaTwoCode',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition>
+      alphaTwoCodeIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'alphaTwoCode',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition>
+      alphaTwoCodeIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'alphaTwoCode',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> englishEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'english',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> englishGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'english',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> englishLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'english',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> englishBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'english',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> englishStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'english',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> englishEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'english',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> englishContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'english',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> englishMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'english',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> englishIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'english',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Language, Language, QAfterFilterCondition> englishIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'english',
+        value: '',
+      ));
+    });
+  }
+}
+
+extension LanguageQueryObject
+    on QueryBuilder<Language, Language, QFilterCondition> {}
+
+// coverage:ignore-file
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters
+
 const LanguagesSchema = Schema(
   name: r'Languages',
   id: -1188574120358875103,
@@ -4725,7 +5070,8 @@ const LanguagesSchema = Schema(
     r'languages': PropertySchema(
       id: 0,
       name: r'languages',
-      type: IsarType.stringList,
+      type: IsarType.objectList,
+      target: r'Language',
     )
   },
   estimateSize: _languagesEstimateSize,
@@ -4745,9 +5091,10 @@ int _languagesEstimateSize(
     if (list != null) {
       bytesCount += 3 + list.length * 3;
       {
+        final offsets = allOffsets[Language]!;
         for (var i = 0; i < list.length; i++) {
           final value = list[i];
-          bytesCount += value.length * 3;
+          bytesCount += LanguageSchema.estimateSize(value, offsets, allOffsets);
         }
       }
     }
@@ -4761,7 +5108,12 @@ void _languagesSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeStringList(offsets[0], object.languages);
+  writer.writeObjectList<Language>(
+    offsets[0],
+    allOffsets,
+    LanguageSchema.serialize,
+    object.languages,
+  );
 }
 
 Languages _languagesDeserialize(
@@ -4771,7 +5123,12 @@ Languages _languagesDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Languages(
-    languages: reader.readStringList(offsets[0]),
+    languages: reader.readObjectList<Language>(
+      offsets[0],
+      LanguageSchema.deserialize,
+      allOffsets,
+      Language(),
+    ),
   );
   return object;
 }
@@ -4784,7 +5141,12 @@ P _languagesDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readStringList(offset)) as P;
+      return (reader.readObjectList<Language>(
+        offset,
+        LanguageSchema.deserialize,
+        allOffsets,
+        Language(),
+      )) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -4805,142 +5167,6 @@ extension LanguagesQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNotNull(
         property: r'languages',
-      ));
-    });
-  }
-
-  QueryBuilder<Languages, Languages, QAfterFilterCondition>
-      languagesElementEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'languages',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Languages, Languages, QAfterFilterCondition>
-      languagesElementGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'languages',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Languages, Languages, QAfterFilterCondition>
-      languagesElementLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'languages',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Languages, Languages, QAfterFilterCondition>
-      languagesElementBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'languages',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Languages, Languages, QAfterFilterCondition>
-      languagesElementStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'languages',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Languages, Languages, QAfterFilterCondition>
-      languagesElementEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'languages',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Languages, Languages, QAfterFilterCondition>
-      languagesElementContains(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'languages',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Languages, Languages, QAfterFilterCondition>
-      languagesElementMatches(String pattern, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'languages',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Languages, Languages, QAfterFilterCondition>
-      languagesElementIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'languages',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<Languages, Languages, QAfterFilterCondition>
-      languagesElementIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'languages',
-        value: '',
       ));
     });
   }
@@ -5035,7 +5261,14 @@ extension LanguagesQueryFilter
 }
 
 extension LanguagesQueryObject
-    on QueryBuilder<Languages, Languages, QFilterCondition> {}
+    on QueryBuilder<Languages, Languages, QFilterCondition> {
+  QueryBuilder<Languages, Languages, QAfterFilterCondition> languagesElement(
+      FilterQuery<Language> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.object(q, r'languages');
+    });
+  }
+}
 
 // coverage:ignore-file
 // ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters

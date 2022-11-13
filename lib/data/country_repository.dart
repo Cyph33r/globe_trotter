@@ -6,7 +6,7 @@ import '../models/country.dart';
 
 class CountryRepository {
   static final _countries = <int, Country>{};
-  static late List<Country> _sortedCountries = <Country>[];
+  static List<Country> _sortedCountries = <Country>[];
 
   static late Isar countryDb;
 
@@ -18,9 +18,13 @@ class CountryRepository {
     return [..._sortedCountries];
   }
 
-  List<Country> filterCountries(CountryFilter filter) {
-    final toReturn = getAllCountries.values.toList();
-    if (filter.language != null) {}
+  static List<Country> getCountriesToDisplay(CountryFilter filter) {
+    final toReturn = _sortedCountries;
+    if (filter.language.name != "none") {
+      toReturn.removeWhere((country) => !(country.language?.languages?.any(
+              (language) => language.alphaTwoCode == filter.language.name) ??
+          false));
+    }
     if (filter.name != null || filter.prefix != null) {
       toReturn.removeWhere((country) => country.name?.common != filter.name);
     }
@@ -31,7 +35,7 @@ class CountryRepository {
           false));
     }
 
-    return <Country>[];
+    return toReturn;
   }
 
   CountryRepository._();
@@ -74,29 +78,29 @@ class CountryFilter {
   TimeZone? timeZone;
   Continent? continent;
   String? name;
-  Language? language;
+  FilterLanguages language = FilterLanguages.none;
 
   CountryFilter startsWith(String prefix) {
     this.prefix = prefix;
     return this;
   }
 
-  CountryFilter withTimezone(TimeZone timeZone) {
+  CountryFilter withTimezone(TimeZone? timeZone) {
     this.timeZone = timeZone;
     return this;
   }
 
-  CountryFilter inContinent(Continent continent) {
+  CountryFilter inContinent(Continent? continent) {
     this.continent = continent;
     return this;
   }
 
-  CountryFilter withName(String name) {
+  CountryFilter withName(String? name) {
     this.name = name;
     return this;
   }
 
-  CountryFilter withLanguage(Language language) {
+  CountryFilter withLanguage(FilterLanguages language) {
     this.language = language;
     return this;
   }
@@ -149,7 +153,22 @@ class TimeZone {
 
 enum Continent { d }
 
-enum Language { dm }
+enum FilterLanguages {
+  none,
+  ara,
+  eng,
+  spa,
+  fra,
+  hin,
+  ita,
+  msa,
+  nld,
+  por,
+  rus,
+  swe,
+  tur,
+  zho
+}
 
 enum TimeZoneCode {
   UTC_MINUS_12,

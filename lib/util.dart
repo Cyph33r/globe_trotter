@@ -12,9 +12,9 @@ extension ListUtil on List {
     var toReturn = prefix;
     for (int i = 0; i < length; i++) {
       if (i != length - 1) {
-        toReturn += this[i] + separator;
+        toReturn += this[i].toString() + separator;
       } else {
-        toReturn += this[i];
+        toReturn += this[i].toString();
       }
     }
     toReturn += postfix;

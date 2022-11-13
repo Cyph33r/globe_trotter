@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../data/country_repository.dart';
 import '../widgets/country_map_card.dart';
 import '../models/country.dart';
 import '../util.dart' show StringUtil, ListUtil;
 
-//todo:ensure that it nothing overflows
 class CountryInfoScreen extends StatelessWidget {
   const CountryInfoScreen({Key? key}) : super(key: key);
   static const routeName = '/country_info_screen';
@@ -17,8 +17,14 @@ class CountryInfoScreen extends StatelessWidget {
     final country = CountryRepository.getAllCountries[countryCode]!;
 
     return Scaffold(
-      appBar: CupertinoNavigationBar(
-        middle: Text(country.name?.common ?? "Unknown"),
+      appBar: AppBar(
+        title: Text(
+          country.name?.common ?? "Unknown",
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontFamily: GoogleFonts.inter().fontFamily),
+        ),
+        iconTheme: Theme.of(context).iconTheme,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,10 +77,12 @@ class CountryInfoPanel extends StatelessWidget {
           const SizedBox(
             height: 24,
           ),
-
           CountryInfoItem(
               tag: "Official languages",
-              info: country.languages?.languages?.stringify(separator: ", ") ??
+              info: country.language?.languages
+                      ?.map((language) => language.english)
+                      .toList()
+                      .stringify(separator: ", ") ??
                   "Unknown"),
           const SizedBox(
             height: 24,
@@ -96,8 +104,9 @@ class CountryInfoPanel extends StatelessWidget {
           ),
           CountryInfoItem(
               tag: "Currencies",
-              info: country.currencies?.currencies?.first.name ?? "Unknown"),
-          //todo:include all with symbol
+              info:
+                  country.currencies?.currencies?.stringify(separator: ", ") ??
+                      "Unknown"),
           const SizedBox(
             height: 24,
           ),
@@ -118,7 +127,6 @@ class CountryInfoPanel extends StatelessWidget {
           const SizedBox(
             height: 4,
           ),
-          //todo:get idd
           CountryInfoItem(
               tag: "Driving side", info: country.car!.side!.toTitleCase())
         ],

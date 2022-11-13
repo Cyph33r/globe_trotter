@@ -16,7 +16,7 @@ class Country {
     this.capital,
     this.region,
     this.subregion,
-    this.languages,
+    this.language,
     this.landlocked,
     this.borders,
     this.area,
@@ -43,7 +43,7 @@ class Country {
     capital = json['capital'] != null ? json['capital'].cast<String>() : [];
     region = json['region'];
     subregion = json['subregion'];
-    languages = json['languages'] != null
+    language = json['languages'] != null
         ? Languages.fromJson(json['languages'])
         : null;
     landlocked = json['landlocked'];
@@ -74,7 +74,7 @@ class Country {
   List<String>? capital;
   String? region;
   String? subregion;
-  Languages? languages;
+  Languages? language;
   bool? landlocked;
   List<String>? borders;
   double? area;
@@ -95,7 +95,7 @@ class DialingCode {
   DialingCode([this.codes = const <String>[]]);
 
   DialingCode.fromJson(Map<String, dynamic> json) {
-    if(json["root"] == null) return;
+    if (json["root"] == null) return;
     final root = json['root'];
     for (final suffix in (json['suffixes'] ?? [""])) {
       codes.add(root + suffix);
@@ -165,16 +165,25 @@ class Maps {
 }
 
 @embedded
+class Language {
+  String alphaTwoCode;
+  String english;
+
+  Language({this.alphaTwoCode = "", this.english = ""});
+}
+
+@embedded
 class Languages {
-  List<String>? languages = [];
+  List<Language>? languages = [];
 
   Languages({
     this.languages,
   });
 
   Languages.fromJson(Map<String, dynamic> json) {
-    for (final language in json.values) {
-      languages!.add(language);
+    for (final language in json.entries) {
+      languages!
+          .add(Language(alphaTwoCode: language.key, english: language.value));
     }
   }
 }
@@ -183,6 +192,11 @@ class Languages {
 class Currency {
   String? symbol;
   String? name;
+
+  @override
+  String toString() {
+    return "$name ($symbol)";
+  }
 
   Currency({this.symbol, this.name});
 

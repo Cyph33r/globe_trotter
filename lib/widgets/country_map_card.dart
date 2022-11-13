@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../models/country.dart';
@@ -27,6 +29,21 @@ class _CountryMapCardState extends State<CountryMapCard> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Image.network(
+                    errorBuilder: (context, object, stacktrace) {
+                      if (object is ArgumentError) {
+                        return Center(
+                          child: SizedBox(
+                            width: 200,
+                            child: Text(
+                              "Could not find ${displayFlag ? "Flag" : "Coat of Arms"} image for ${widget.country.name!.common}",
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }
+                      return const Center(
+                          child: Text("Can't load Image: Bad Network"));
+                    },
                     loadingBuilder: (BuildContext context, Widget child,
                         ImageChunkEvent? loadingProgress) {
                       if (loadingProgress == null) return child;
