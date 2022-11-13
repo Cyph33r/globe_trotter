@@ -4,15 +4,21 @@ import 'package:provider/provider.dart';
 
 import '../data/country_repository.dart';
 
-class SearchBar extends StatelessWidget {
-  final TextEditingController _searchFieldController = TextEditingController();
+class SearchBar extends StatefulWidget {
 
   SearchBar({Key? key}) : super(key: key);
 
   @override
+  State<SearchBar> createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<SearchBar> {
+  final TextEditingController _searchFieldController = TextEditingController();
+
+  @override
   Widget build(BuildContext context) {
-    final FilterProvider currentFilter =
-        Provider.of<FilterProvider>(context);
+    final FilterProvider filterProvider =
+        Provider.of<FilterProvider>(context, listen: false);
     return Container(
       height: 48,
       width: 360,
@@ -33,7 +39,10 @@ class SearchBar extends StatelessWidget {
                   decoration: const InputDecoration(
                       hintText: "Search Country", border: InputBorder.none),
                   controller: _searchFieldController,
-                  onChanged: (value) {}))
+                  onChanged: (value) {
+                    filterProvider.editFilter(
+                        prefix: value);
+                  }))
         ],
       ),
     );

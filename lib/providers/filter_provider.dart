@@ -9,12 +9,11 @@ class FilterProvider with ChangeNotifier {
   }
 
   void editFilter(
-      {String? name,
+      {
       FilterLanguages? language,
       String? prefix,
       TimeZone? timeZone,
       Continent? continent}) {
-    if (name != null) _filter.name = name;
     if (language != null) {
       _filter.language = language;
     }

@@ -25,8 +25,9 @@ class CountryRepository {
               (language) => language.alphaTwoCode == filter.language.name) ??
           false));
     }
-    if (filter.name != null || filter.prefix != null) {
-      toReturn.removeWhere((country) => country.name?.common != filter.name);
+    if (filter.prefix != "") {
+      toReturn.removeWhere((country) =>
+          !(country.name?.common?.toLowerCase().startsWith(filter.prefix!) ?? false));
     }
     if (filter.continent != null) {}
     if (filter.timeZone != null) {
@@ -74,36 +75,10 @@ class CountryRepository {
 }
 
 class CountryFilter {
-  String? prefix;
+  String prefix="";
   TimeZone? timeZone;
   Continent? continent;
-  String? name;
   FilterLanguages language = FilterLanguages.none;
-
-  CountryFilter startsWith(String prefix) {
-    this.prefix = prefix;
-    return this;
-  }
-
-  CountryFilter withTimezone(TimeZone? timeZone) {
-    this.timeZone = timeZone;
-    return this;
-  }
-
-  CountryFilter inContinent(Continent? continent) {
-    this.continent = continent;
-    return this;
-  }
-
-  CountryFilter withName(String? name) {
-    this.name = name;
-    return this;
-  }
-
-  CountryFilter withLanguage(FilterLanguages language) {
-    this.language = language;
-    return this;
-  }
 }
 
 class TimeZone {
