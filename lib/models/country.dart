@@ -24,7 +24,6 @@ class Country {
     this.population,
     this.car,
     this.timezones,
-    this.continents,
     this.flags,
     this.coatOfArms,
     this.startOfWeek,
@@ -54,8 +53,7 @@ class Country {
     car = json['car'] != null ? Car.fromJson(json['car']) : null;
     timezones =
         json['timezones'] != null ? json['timezones'].cast<String>() : [];
-    continents =
-        json['continents'] != null ? json['continents'].cast<String>() : [];
+
     flags = json['flags'] != null ? Flags.fromJson(json['flags']) : null;
     coatOfArms = json['coatOfArms'] != null
         ? CoatOfArms.fromJson(json['coatOfArms'])
@@ -82,7 +80,6 @@ class Country {
   int? population;
   Car? car;
   List<String>? timezones;
-  List<String>? continents;
   Flags? flags;
   CoatOfArms? coatOfArms;
   String? startOfWeek;

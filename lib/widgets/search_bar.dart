@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:globe_trotter/providers/filter_provider.dart';
+import 'package:globe_trotter/providers/country_filters.dart';
 import 'package:provider/provider.dart';
 
-import '../data/country_repository.dart';
 
 class SearchBar extends StatefulWidget {
-
-  SearchBar({Key? key}) : super(key: key);
+  const SearchBar({Key? key}) : super(key: key);
 
   @override
   State<SearchBar> createState() => _SearchBarState();
@@ -17,8 +15,8 @@ class _SearchBarState extends State<SearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    final FilterProvider filterProvider =
-        Provider.of<FilterProvider>(context, listen: false);
+    final CountryFilters filterProvider =
+        Provider.of<CountryFilters>(context, listen: false);
     return Container(
       height: 48,
       width: 360,
@@ -37,11 +35,11 @@ class _SearchBarState extends State<SearchBar> {
           Expanded(
               child: TextField(
                   decoration: const InputDecoration(
-                      hintText: "Search Country", border: InputBorder.none),
+                      hintText: "Search Country or Capital",
+                      border: InputBorder.none),
                   controller: _searchFieldController,
                   onChanged: (value) {
-                    filterProvider.editFilter(
-                        prefix: value);
+                    filterProvider.editFilter(prefix: value);
                   }))
         ],
       ),

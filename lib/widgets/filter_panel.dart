@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:globe_trotter/providers/filter_provider.dart';
+import 'package:globe_trotter/providers/country_filters.dart';
+import 'package:globe_trotter/util.dart';
 import 'package:provider/provider.dart';
 
 import '../data/country_repository.dart';
@@ -22,14 +23,20 @@ class GeneralFilterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FilterProvider currentFilter =
-        Provider.of<FilterProvider>(context, listen: false);
+    final CountryFilters filterProvider =
+        Provider.of<CountryFilters>(context, listen: false);
     return ElevatedButton.icon(
       icon: SvgPicture.asset(
         "assets/general_filter_icon.svg",
         color: Theme.of(context).iconTheme.color,
       ),
-      onPressed: () {},
+      onPressed: () => showModalBottomSheet(
+          context: context,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(32), topRight: Radius.circular(32)),
+          ),
+          builder: (context) => const GeneralFilterModalSheet()),
       style: ButtonStyle(
           alignment: Alignment.centerLeft,
           elevation: const MaterialStatePropertyAll<double>(1),
@@ -54,7 +61,7 @@ class LanguageFilterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FilterProvider currentFilter = Provider.of<FilterProvider>(context);
+    final CountryFilters filterProvider = Provider.of<CountryFilters>(context);
     return ElevatedButton.icon(
       icon: SvgPicture.asset(
         "assets/language_filter_icon.svg",
@@ -66,7 +73,7 @@ class LanguageFilterButton extends StatelessWidget {
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(32), topRight: Radius.circular(32)),
           ),
-          builder: (context) => const LanguageFilterList()),
+          builder: (context) => const LanguageFilterModalSheet()),
       style: ButtonStyle(
           alignment: Alignment.centerLeft,
           elevation: const MaterialStatePropertyAll<double>(1),
@@ -76,9 +83,9 @@ class LanguageFilterButton extends StatelessWidget {
               Theme.of(context).scaffoldBackgroundColor),
           fixedSize: const MaterialStatePropertyAll<Size>(Size(74, 40))),
       label: Text(
-        currentFilter.filter.language.name == "none"
+        filterProvider.filter.language.name == "all"
             ? "--"
-            : currentFilter.filter.language.name,
+            : filterProvider.filter.language.name,
         style: Theme.of(context)
             .textTheme
             .bodyMedium!
@@ -88,9 +95,104 @@ class LanguageFilterButton extends StatelessWidget {
   }
 }
 
-class LanguageFilterList extends StatelessWidget {
+class GeneralFilterModalSheet extends StatefulWidget {
+  const GeneralFilterModalSheet({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<GeneralFilterModalSheet> createState() =>
+      _GeneralFilterModalSheetState();
+}
+
+class _GeneralFilterModalSheetState extends State<GeneralFilterModalSheet> {
+  var showTimeZones = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final CountryFilters filterProvider = Provider.of<CountryFilters>(context);
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Filter",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              InkWell(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: const Icon(Icons.cancel))
+            ],
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 24,
+                    ),
+                    const Text(
+                      "Region",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: Region.values
+                          .map((region) => RegionFilterItem(
+                                region: region,
+                                filterProvider: filterProvider,
+                              ))
+                          .toList(),
+                    ),
+                    const SizedBox(
+                      height: 4,
+                    ),
+                    GestureDetector(
+                      onTap: () => setState(() {
+                        showTimeZones = !showTimeZones;
+                      }),
+                      behavior: HitTestBehavior.opaque,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Timezone",
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          Icon(showTimeZones
+                              ? Icons.expand_less
+                              : Icons.expand_more)
+                        ],
+                      ),
+                    ),
+                    if (showTimeZones)
+                      Column(
+                        children: timeZodeCodes
+                            .map((timeZoneCode) => TimeZoneFilterItem(
+                                  timeZone: timeZoneCode,
+                                  filterProvider: filterProvider,
+                                ))
+                            .toList(),
+                      )
+                  ]),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class LanguageFilterModalSheet extends StatelessWidget {
   final languageFilterList = const {
-    "none": "None",
+    "all": "All",
     "ara": "بالعربية",
     "eng": "English",
     "spa": "Español",
@@ -106,14 +208,12 @@ class LanguageFilterList extends StatelessWidget {
     "zho": "普通话",
   };
 
-  const LanguageFilterList({Key? key}) : super(key: key);
+  const LanguageFilterModalSheet({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final FilterProvider filterProvider =
-        Provider.of<FilterProvider>(context, listen: false);
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -125,16 +225,107 @@ class LanguageFilterList extends StatelessWidget {
             child: ListView(
               children: [
                 ...languageFilterList.entries
-                    .map((language) => LanguageFilterItem(
-                            languageCode: {
-                              "iso_code": language.key,
-                              "language": language.value
-                            }))
+                    .map((language) => LanguageFilterItem(languageCode: {
+                          "iso_code": language.key,
+                          "language": language.value
+                        }))
                     .toList()
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class RegionFilterItem extends StatelessWidget {
+  final Region region;
+  final CountryFilters filterProvider;
+
+  void updateRegion() {
+    final toShow = filterProvider.filter.regions;
+    var isFiltering = filterProvider.filter.regions.contains(region);
+
+    if (isFiltering == true) {
+      toShow.removeWhere((region) => region == this.region);
+      filterProvider.editFilter(region: toShow);
+    } else {
+      toShow.add(region);
+      filterProvider.editFilter(region: toShow);
+    }
+  }
+
+  const RegionFilterItem(
+      {required this.region, required this.filterProvider, Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final CountryFilters filterProvider = Provider.of<CountryFilters>(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => updateRegion(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              region.name,
+              textAlign: TextAlign.start,
+            ),
+            Checkbox(
+                value: filterProvider.filter.regions.contains(region),
+                onChanged: (newValue) => updateRegion())
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class TimeZoneFilterItem extends StatelessWidget {
+  final String timeZone;
+  final CountryFilters filterProvider;
+
+  void updateTimeZone() {
+    final toShow = filterProvider.filter.timeZones;
+    var isFiltering = filterProvider.filter.timeZones.contains(timeZone);
+
+    if (isFiltering == true) {
+      toShow.removeWhere((timeZone) => timeZone == this.timeZone);
+      filterProvider.editFilter(timeZone: toShow);
+    } else {
+      toShow.add(timeZone);
+      filterProvider.editFilter(timeZone: toShow);
+    }
+  }
+
+  const TimeZoneFilterItem(
+      {required this.timeZone, required this.filterProvider, Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final CountryFilters filterProvider = Provider.of<CountryFilters>(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => updateTimeZone(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              timeZone,
+              textAlign: TextAlign.start,
+            ),
+            Checkbox(
+                value: filterProvider.filter.timeZones.contains(timeZone),
+                onChanged: (newValue) => updateTimeZone())
+          ],
+        ),
       ),
     );
   }
@@ -146,7 +337,8 @@ class LanguageFilterItem extends StatelessWidget {
   const LanguageFilterItem({required this.languageCode, Key? key})
       : super(key: key);
 
-  void updateFilter(FilterProvider filterProvider) {
+  void updateFilter(BuildContext context, CountryFilters filterProvider) {
+    Navigator.of(context).pop();
     return filterProvider.editFilter(
         language: FilterLanguages.values.firstWhere(
             (language) => language.name == languageCode["iso_code"]));
@@ -154,12 +346,13 @@ class LanguageFilterItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FilterProvider filterProvider = Provider.of<FilterProvider>(context);
+    final CountryFilters filterProvider =
+        Provider.of<CountryFilters>(context, listen: false);
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => updateFilter(filterProvider),
+        onTap: () => updateFilter(context, filterProvider),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -170,7 +363,8 @@ class LanguageFilterItem extends StatelessWidget {
             Radio<String>(
                 value: languageCode["iso_code"]!,
                 groupValue: filterProvider.filter.language.name,
-                onChanged: (languageCode) => updateFilter(filterProvider)),
+                onChanged: (languageCode) =>
+                    updateFilter(context, filterProvider)),
           ],
         ),
       ),

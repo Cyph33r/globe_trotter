@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../models/country.dart';
@@ -28,8 +27,11 @@ class _CountryMapCardState extends State<CountryMapCard> {
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.network(
-                    errorBuilder: (context, object, stacktrace) {
+                  child: CachedNetworkImage(
+                    imageUrl: displayFlag
+                        ? widget.country.flags?.png ?? ""
+                        : widget.country.coatOfArms?.png ?? "",
+                    errorWidget: (context, object, stacktrace) {
                       if (object is ArgumentError) {
                         return Center(
                           child: SizedBox(
@@ -44,21 +46,13 @@ class _CountryMapCardState extends State<CountryMapCard> {
                       return const Center(
                           child: Text("Can't load Image: Bad Network"));
                     },
-                    loadingBuilder: (BuildContext context, Widget child,
-                        ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) return child;
+                    progressIndicatorBuilder: (BuildContext context,
+                        String child, DownloadProgress loadingProgress) {
                       return Center(
                         child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!.toDouble()
-                              : null,
-                        ),
+                            value: loadingProgress.progress),
                       );
                     },
-                    displayFlag
-                        ? widget.country.flags?.png ?? ""
-                        : widget.country.coatOfArms?.png ?? "",
                     height: 160,
                     width: 320,
                   ),

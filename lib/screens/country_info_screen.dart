@@ -17,14 +17,14 @@ class CountryInfoScreen extends StatelessWidget {
     final country = CountryRepository.getAllCountries[countryCode]!;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
+      appBar: CupertinoNavigationBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        middle: Text(
           country.name?.common ?? "Unknown",
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               fontFamily: GoogleFonts.inter().fontFamily),
         ),
-        iconTheme: Theme.of(context).iconTheme,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

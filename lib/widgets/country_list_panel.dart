@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart' show groupBy;
+import 'package:globe_trotter/util.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../data/country_repository.dart';
 import '../models/country.dart';
-import '../providers/filter_provider.dart';
+import '../providers/country_filters.dart';
 import '../screens/country_info_screen.dart';
 
 class CountryListPanel extends StatelessWidget {
-  CountryListPanel({
+  const CountryListPanel({
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final CountryFilter currentFilter =
-        Provider.of<FilterProvider>(context,listen: false).filter;
+        Provider.of<CountryFilters>(context, listen: false).filter;
     final Map<String, List<Country>> countriesGrouped = groupBy(
         CountryRepository.getCountriesToDisplay(currentFilter),
         (country) => country.name?.common![0] ?? "??");
     return ListView.builder(
+        physics: const BouncingScrollPhysics(),
         itemCount: countriesGrouped.length,
         itemBuilder: (context, itemIndex) {
           return CountryListAlphaPanel(
@@ -79,17 +82,35 @@ class CountryListItem extends StatelessWidget {
             children: [
               ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.network(
-                    country.flags?.png ?? "",
-                    loadingBuilder: (BuildContext context, Widget child,
-                        ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) return child;
+                  child: CachedNetworkImage(
+                    imageUrl: country.flags?.png ?? "",
+                    errorWidget: (context, object, stacktrace) {
+                      if (object is ArgumentError) {
+                        return Center(
+                          child: SizedBox(
+                            width: 200,
+                            child: Text(
+                              "Could not find flag image for ${country.name!.common}",
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        );
+                      }
+                      return const Center(
+                          child: Text(
+                        "Can't load Image: Bad Network",
+                        textAlign: TextAlign.center,
+                      ));
+                    },
+                    progressIndicatorBuilder: (BuildContext context, String url,
+                        DownloadProgress loadingProgress) {
                       return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!.toDouble()
-                              : null,
+                        child: SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.progress,
+                          ),
                         ),
                       );
                     },
@@ -100,37 +121,36 @@ class CountryListItem extends StatelessWidget {
               const SizedBox(
                 width: 16,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    fit: FlexFit.loose,
-                    child: Container(
-                      width: 260,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      // width: 260,
                       child: Text(
                         country.name?.common ?? "Unknown",
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 2,
-                  ),
-                  country.capital == null || country.capital!.isEmpty
-                      ? Text(
-                          "No Capital",
-                          style: capitalTextColor,
-                          overflow: TextOverflow.ellipsis,
-                        )
-                      : Text(
-                          country.capital!.first,
-                          style: capitalTextColor,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        )
-                ],
+                    const SizedBox(
+                      height: 2,
+                    ),
+                    country.capital == null || country.capital!.isEmpty
+                        ? Text(
+                            "No Capital",
+                            style: capitalTextColor,
+                            overflow: TextOverflow.ellipsis,
+                          )
+                        : Text(
+                            country.capital!.stringify(separator: ", "),
+                            style: capitalTextColor,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          )
+                  ],
+                ),
               )
             ],
           ),

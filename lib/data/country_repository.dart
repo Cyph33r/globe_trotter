@@ -1,6 +1,5 @@
 import 'package:isar/isar.dart';
 import '../data/country_api_helper.dart';
-import 'package:collection/collection.dart' show insertionSort;
 
 import '../models/country.dart';
 
@@ -20,20 +19,27 @@ class CountryRepository {
 
   static List<Country> getCountriesToDisplay(CountryFilter filter) {
     final toReturn = _sortedCountries;
-    if (filter.language.name != "none") {
-      toReturn.removeWhere((country) => !(country.language?.languages?.any(
+    if (filter.language.name != "all") {
+      toReturn.retainWhere((country) =>
+          country.language?.languages?.any(
               (language) => language.alphaTwoCode == filter.language.name) ??
-          false));
+          false);
     }
     if (filter.prefix != "") {
-      toReturn.removeWhere((country) =>
-          !(country.name?.common?.toLowerCase().startsWith(filter.prefix!) ?? false));
+      toReturn.retainWhere((country) =>
+          country.name?.common?.toLowerCase().startsWith(filter.prefix) ??
+          false ||
+              (country.capital?.any((capital) =>
+                      capital.toLowerCase().startsWith(filter.prefix)) ??
+                  false));
     }
-    if (filter.continent != null) {}
-    if (filter.timeZone != null) {
-      toReturn.removeWhere((country) => !(country.timezones
-              ?.any((timeZone) => timeZone == filter.timeZone?.asString) ??
-          false));
+    if (filter.regions.isNotEmpty) {
+      toReturn.retainWhere((country) =>
+          filter.regions.any((region) => country.region == region.name));
+    }
+    if (filter.timeZones.isNotEmpty) {
+      toReturn.retainWhere((country) => filter.timeZones
+          .any((timezone) => country.timezones?.contains(timezone) ?? false));
     }
 
     return toReturn;
@@ -75,61 +81,16 @@ class CountryRepository {
 }
 
 class CountryFilter {
-  String prefix="";
-  TimeZone? timeZone;
-  Continent? continent;
-  FilterLanguages language = FilterLanguages.none;
+  String prefix = "";
+  List<String> timeZones = [];
+  List<Region> regions = [];
+  FilterLanguages language = FilterLanguages.all;
 }
 
-class TimeZone {
-  TimeZoneCode code;
-
-  get asString {
-    _timeZoneToString[code.index];
-  }
-
-  static const _timeZoneToString = [
-    "UTC-12",
-    "UTC-11",
-    "UTC-10",
-    "UTC-9",
-    "UTC-8",
-    "UTC-7",
-    "UTC-6",
-    "UTC-5",
-    "UTC-4",
-    "UTC-3",
-    "UTC-2",
-    "UTC-1",
-    "UTC+0",
-    "UTC+1",
-    "UTC+2",
-    "UTC+3",
-    "UTC+4",
-    "UTC+5",
-    "UTC+6",
-    "UTC+7",
-    "UTC+8",
-    "UTC+9",
-    "UTC+10",
-    "UTC+11",
-    "UTC+12",
-    "UTC+13",
-    "UTC+14",
-  ];
-
-  TimeZone(this.code);
-
-  @override
-  String toString() {
-    return _timeZoneToString[code.index];
-  }
-}
-
-enum Continent { d }
+enum Region { Africa, Americas, Antarctic, Asia, Europe, Oceania }
 
 enum FilterLanguages {
-  none,
+  all,
   ara,
   eng,
   spa,
@@ -145,32 +106,32 @@ enum FilterLanguages {
   zho
 }
 
-enum TimeZoneCode {
-  UTC_MINUS_12,
-  UTC_MINUS_11,
-  UTC_MINUS_10,
-  UTC_MINUS_9,
-  UTC_MINUS_8,
-  UTC_MINUS_7,
-  UTC_MINUS_6,
-  UTC_MINUS_5,
-  UTC_MINUS_4,
-  UTC_MINUS_3,
-  UTC_MINUS_2,
-  UTC_MINUS_1,
-  UTC_PLUS_0,
-  UTC_PLUS_1,
-  UTC_PLUS_2,
-  UTC_PLUS_3,
-  UTC_PLUS_4,
-  UTC_PLUS_5,
-  UTC_PLUS_6,
-  UTC_PLUS_7,
-  UTC_PLUS_8,
-  UTC_PLUS_9,
-  UTC_PLUS_10,
-  UTC_PLUS_11,
-  UTC_PLUS_12,
-  UTC_PLUS_13,
-  UTC_PLUS_14,
-}
+const timeZodeCodes = [
+  "UTC-12",
+  "UTC-11",
+  "UTC-10",
+  "UTC-9",
+  "UTC-8",
+  "UTC-7",
+  "UTC-6",
+  "UTC-5",
+  "UTC-4",
+  "UTC-3",
+  "UTC-2",
+  "UTC-1",
+  "UTC+0",
+  "UTC+1",
+  "UTC+2",
+  "UTC+3",
+  "UTC+4",
+  "UTC+5",
+  "UTC+6",
+  "UTC+7",
+  "UTC+8",
+  "UTC+9",
+  "UTC+10",
+  "UTC+11",
+  "UTC+12",
+  "UTC+13",
+  "UTC+14",
+];

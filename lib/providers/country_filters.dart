@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:globe_trotter/data/country_repository.dart';
 
-class FilterProvider with ChangeNotifier {
+class CountryFilters with ChangeNotifier {
   final CountryFilter _filter = CountryFilter();
 
   CountryFilter get filter {
@@ -12,14 +12,14 @@ class FilterProvider with ChangeNotifier {
       {
       FilterLanguages? language,
       String? prefix,
-      TimeZone? timeZone,
-      Continent? continent}) {
+      List<String>? timeZone,
+      List<Region>? region}) {
     if (language != null) {
       _filter.language = language;
     }
     if (prefix != null) _filter.prefix = prefix;
-    if (timeZone != null) _filter.timeZone = timeZone;
-    if (continent != null) _filter.continent = filter.continent;
+    if (timeZone != null) _filter.timeZones = timeZone;
+    if (region != null) _filter.regions = filter.regions;
     notifyListeners();
   }
 }
