@@ -1,8 +1,8 @@
 # globe_trotter
 
 A new way to travel the world.
-![Light mode](https://ibb.co/99KsRxw)
-![Dark mode](https://ibb.co/s6Gw1k5)
+<img alt="Light mode" src="https://ibb.co/99KsRxw"/>
+<img alt="Dark mode" src="https://ibb.co/s6Gw1k5"/>
 
 A description of the app and its features.
 
