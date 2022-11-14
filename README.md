@@ -31,4 +31,4 @@ countries [api](https://restcountries.com/#api-endpoints-v3-all)
 ## Planned Features
 
 [.apk file link](https://drive.google.com/open?id=18tbqLCWPItI2AXLTYDEE5s47pXOYXM5f&authuser=tadeajai4%40gmail.com&usp=drive_fs)
-[Appetizer link](https://appetize.io/app/lwd6ho2dk2p4hpscpwjngscpci?device=pixel6&osVersion=12.0&scale=75)
+[Appetizer link](https://appetize.io/app/lwd6ho2dk2p4hpscpwjngscpci?device=pixel4&osVersion=12.0&scale=75)
